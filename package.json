@@ -1,0 +1,25 @@
+{
+  "name": "waasila-site",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "new": "node scripts/new-post.mjs",
+    "deploy": "astro build && wrangler deploy",
+    "test": "node --experimental-strip-types --test worker/*.test.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@astrojs/mdx": "^8.1.0",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.4.0"
+  },
+  "type": "module",
+  "devDependencies": {
+    "wrangler": "^4.151.1"
+  }
+}

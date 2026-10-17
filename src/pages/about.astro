@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../site';
+import ContactForm from '../components/ContactForm.astro';
+---
+<Base title="About" description="About Waasila Asif.">
+  <h1>About</h1>
+  <div class="prose">
+    <!-- Rewrite this page in your own voice. The facts are right; the tone should be yours. -->
+    <p>
+      I'm Waasila Asif, a computer science student at NUST SEECS in Islamabad, class of 2028.
+      I came to CS through mathematics and stayed for the part where you find out what the machine
+      is actually doing.
+    </p>
+    <p>
+      My focus is systems and security: how programs become processes, how binaries are laid out,
+      and how all of that can be abused. I'm working through CS:APP and pwn.college, building
+      <a href="https://github.com/WaasilaAsif/pyelf-teach">pyelf-teach</a>, and contributing to
+      open-source security tooling.
+    </p>
+    <p>
+      I'm tech lead at GDG on Campus NUST, where I look after the AI/ML, web development and
+      cybersecurity teams. Before that I interned as a MERN and Android developer.
+    </p>
+
+    <h2>Elsewhere</h2>
+    <ul>
+      <li><a href={SITE.github}>GitHub</a></li>
+      <li><a href={SITE.medium}>Medium</a></li>
+      {SITE.linkedin && <li><a href={SITE.linkedin}>LinkedIn</a></li>}
+      <li><a href="/rss.xml">RSS feed</a> for new posts</li>
+    </ul>
+
+    <h2 id="contact-me">Contact me</h2>
+    <p>Questions about a post, an opportunity, or just hello. It comes straight to my inbox.</p>
+  </div>
+  <ContactForm />
+  <div class="prose">
+    <h2>This site</h2>
+    <p>
+      Built with Astro, hosted on Cloudflare. No analytics, no cookies. Set in Instrument Sans
+      and JetBrains Mono.
+    </p>
+  </div>
+</Base>

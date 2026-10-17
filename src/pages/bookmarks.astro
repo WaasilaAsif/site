@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import { BOOKMARKS } from '../data/bookmarks';
+---
+<Base title="Bookmarks" description="Writing by other people that Waasila Asif thinks is worth your time.">
+  <h1>Bookmarks</h1>
+  <p class="muted measure">Writing by other people that I think is worth your time.</p>
+
+  <ul class="marks">
+    {BOOKMARKS.map((b) => (
+      <li>
+        <a href={b.url}>{b.title}</a>
+        <span class="by">{b.by}</span>
+        {b.note && <p class="note">{b.note}</p>}
+      </li>
+    ))}
+  </ul>
+</Base>
+
+<style>
+  .marks { list-style: none; padding: 0; margin: 2rem 0 0; }
+  .marks li { padding: 0.6rem 0; border-bottom: 1px solid var(--rule); }
+  .marks li:first-child { border-top: 1px solid var(--rule); }
+  .marks a { color: var(--ink); font-weight: 500; }
+  .marks a:hover { color: var(--cobalt); }
+  .by { color: var(--graphite); font-size: 0.92rem; margin-left: 0.6rem; }
+  .note { margin: 0.2rem 0 0; color: var(--graphite); font-size: 0.95rem; max-width: var(--measure); }
+</style>

@@ -1,0 +1,40 @@
+---
+import Base from '../layouts/Base.astro';
+import Hexdump from '../components/Hexdump.astro';
+import PostList from '../components/PostList.astro';
+import { getPosts } from '../lib/posts';
+import { PROJECTS } from '../site';
+
+const posts = (await getPosts()).slice(0, 6);
+const building = PROJECTS.filter((p) => p.state === 'In development');
+---
+<Base>
+  <h1 class="intro">I'm Waasila. I study computer science at NUST and write about what happens below the abstraction.</h1>
+  <p class="lede measure">
+    Processes, binaries, memory, and the ways they break. Long technical posts, shorter notes,
+    and CTF writeups, mostly about things I had to take apart to understand.
+  </p>
+
+  <Hexdump />
+
+  <section aria-labelledby="recent">
+    <h2 id="recent">Recent writing</h2>
+    <PostList posts={posts} />
+    <p><a href="/writing/">All writing</a></p>
+  </section>
+
+  {building.length > 0 && (
+    <section aria-labelledby="now">
+      <h2 id="now">Currently building</h2>
+      {building.map((p) => (
+        <p class="measure"><a href={p.url}>{p.name}</a>: {p.blurb}</p>
+      ))}
+    </section>
+  )}
+</Base>
+
+<style>
+  .intro { font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.2rem); font-weight: 500; max-width: 26ch; letter-spacing: -0.02em; }
+  .lede { color: var(--graphite); font-size: 1.1rem; margin: 0 0 2.5rem; }
+  section h2 { font-size: 1.1rem; margin-top: 3.5rem; }
+</style>

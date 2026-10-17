@@ -1,0 +1,123 @@
+---
+// Renders HEADER_FIELDS as an `xxd`-style dump with an annotated legend,
+// the way pyelf-teach annotates an ELF header. Hovering or focusing a field in
+// the legend lights up its bytes.
+import { HEADER_FIELDS } from '../site';
+
+const enc = new TextEncoder();
+type Byte = { hex: string; ch: string; field: number };
+const bytes: Byte[] = [];
+const ranges: { label: string; start: number; end: number }[] = [];
+HEADER_FIELDS.forEach((f, i) => {
+  const start = bytes.length;
+  for (const b of enc.encode(f.text)) {
+    bytes.push({
+      hex: b.toString(16).padStart(2, '0'),
+      ch: b >= 0x20 && b < 0x7f ? String.fromCharCode(b) : '.',
+      field: i,
+    });
+  }
+  ranges.push({ label: f.label, start, end: bytes.length - 1 });
+});
+
+const rows = (width: number) => {
+  const out: { off: string; cells: (Byte & { i: number })[] }[] = [];
+  for (let o = 0; o < bytes.length; o += width) {
+    out.push({
+      off: o.toString(16).padStart(8, '0'),
+      cells: bytes.slice(o, o + width).map((b, k) => ({ ...b, i: o + k })),
+    });
+  }
+  return out;
+};
+const hx = (n: number) => '0x' + n.toString(16).padStart(2, '0');
+const plain = HEADER_FIELDS.map((f) => f.text).join('');
+---
+<figure class="dump" data-active="0">
+  <p class="sr-only">{plain}</p>
+  {[16, 8].map((w) => (
+    <pre class={`grid w${w}`} aria-hidden="true">{rows(w).map((r) => (
+      <span class="row"><span class="off">{r.off}</span><span class="hex">{r.cells.map((c) => (
+        <span class="b" data-f={c.field}>{c.hex}</span>
+      ))}{Array.from({ length: w - r.cells.length }).map(() => <span class="b pad">  </span>)}</span><span class="asc">{r.cells.map((c) => (
+        <span class="c" data-f={c.field} style={`--i:${c.i}`}>{c.ch}</span>
+      ))}</span></span>
+    ))}</pre>
+  ))}
+  <figcaption>
+    <ul class="legend">
+      {ranges.map((r, i) => (
+        <li>
+          <button type="button" data-f={i} aria-pressed={i === 0 ? 'true' : 'false'}>
+            <span class="rng">{hx(r.start)}–{hx(r.end)}</span> {r.label}
+          </button>
+        </li>
+      ))}
+    </ul>
+  </figcaption>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.dump').forEach((dump) => {
+    const set = (f: string) => {
+      dump.dataset.active = f;
+      dump.querySelectorAll('.legend button').forEach((b) =>
+        b.setAttribute('aria-pressed', String((b as HTMLElement).dataset.f === f)),
+      );
+    };
+    dump.querySelectorAll<HTMLElement>('[data-f]').forEach((el) => {
+      const f = el.dataset.f!;
+      el.addEventListener('mouseenter', () => set(f));
+      el.addEventListener('focus', () => set(f));
+      el.addEventListener('click', () => set(f));
+    });
+  });
+</script>
+
+<style>
+  .dump { margin: 0 0 3rem; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .grid {
+    font-family: var(--mono); font-size: 0.84rem; line-height: 1.75;
+    margin: 0; padding: 1rem 1.1rem; background: var(--sheet);
+    border: 1px solid var(--rule); border-radius: 6px; overflow-x: auto;
+  }
+  .w8 { display: none; }
+  @media (max-width: 640px) {
+    .w16 { display: none; }
+    .w8 { display: block; }
+  }
+  .row { display: flex; gap: 1.4ch; white-space: pre; }
+  .off { color: var(--graphite); opacity: 0.7; }
+  .hex { display: flex; }
+  .b { padding: 0 0.5ch; }
+  .w16 .hex .b:nth-child(8) { margin-right: 1ch; }
+  @media (max-width: 640px) {
+    .grid { font-size: 0.74rem; padding: 0.8rem; }
+    .row { gap: 1ch; }
+    .b { padding: 0 0.4ch; }
+  }
+  .asc { display: flex; color: var(--graphite); }
+  .b, .c { border-radius: 2px; transition: background-color 120ms, color 120ms; }
+  .pad { visibility: hidden; }
+
+  /* highlight active field */
+  .dump[data-active='0'] [data-f='0'],
+  .dump[data-active='1'] [data-f='1'],
+  .dump[data-active='2'] [data-f='2'],
+  .dump[data-active='3'] [data-f='3'] {
+    background: var(--amber); color: var(--amber-ink);
+  }
+
+  /* one load moment: the ASCII column decodes left to right */
+  .c { animation: decode 1ms steps(1) both; animation-delay: calc(var(--i) * 18ms + 200ms); }
+  @keyframes decode { from { opacity: 0; } to { opacity: 1; } }
+
+  .legend { list-style: none; padding: 0; margin: 0.9rem 0 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; }
+  .legend button {
+    font: inherit; font-size: 0.93rem; color: var(--graphite);
+    background: none; border: 0; padding: 0.1rem 0; cursor: pointer;
+  }
+  .legend button[aria-pressed='true'] { color: var(--ink); text-decoration: underline; text-decoration-color: var(--amber); text-decoration-thickness: 3px; text-underline-offset: 0.3em; }
+  .rng { font-family: var(--mono); font-size: 0.82rem; }
+</style>

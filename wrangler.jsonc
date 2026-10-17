@@ -1,0 +1,24 @@
+{
+  // Static site + a small Worker for /api/*. Deploy with `npm run deploy`.
+  "name": "waasila-site",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    // Only API calls run the Worker; pages are served directly as static files.
+    "run_worker_first": ["/api/*"]
+  },
+  // Sends only to addresses verified under Email Routing (free tier).
+  // No address list here on purpose: this file is public on GitHub.
+  // Recipients live in the CONTACT_TO secret instead.
+  "send_email": [{ "name": "EMAIL" }],
+  "vars": {
+    // Must be an address on your own domain, once Email Routing is on.
+    "CONTACT_FROM": "site@CHANGE-ME.com"
+  }
+  // Secrets (set once, never committed):
+  //   npx wrangler secret put CONTACT_TO        -> a@x.com,b@y.com,c@z.com
+  //   npx wrangler secret put TURNSTILE_SECRET
+}

@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import { PROJECTS } from '../site';
+---
+<Base title="Projects" description="Things Waasila Asif has built: systems tools, security projects, and apps.">
+  <h1>Projects</h1>
+  <p class="muted measure">Mostly systems and security work. Source for all of it is on GitHub.</p>
+
+  <dl class="projects">
+    {PROJECTS.map((p) => (
+      <div class="proj">
+        <dt>
+          <a href={p.url}>{p.name}</a>
+          <span class="state" data-state={p.state}>{p.state}</span>
+        </dt>
+        <dd>
+          <p>{p.blurb}</p>
+          <p class="stack">{p.stack}</p>
+        </dd>
+      </div>
+    ))}
+  </dl>
+</Base>
+
+<style>
+  .projects { margin: 2rem 0 0; }
+  .proj { padding: 1.1rem 0; border-top: 1px solid var(--rule); }
+  .proj:last-child { border-bottom: 1px solid var(--rule); }
+  dt { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.75rem; font-weight: 600; font-size: 1.08rem; }
+  dt a { color: var(--ink); }
+  dt a:hover { color: var(--cobalt); }
+  dd { margin: 0.35rem 0 0; max-width: var(--measure); }
+  dd p { margin: 0; }
+  .stack { font-family: var(--mono); font-size: 0.8rem; color: var(--graphite); margin-top: 0.4rem !important; }
+  .state { font-size: 0.8rem; font-weight: 400; color: var(--graphite); border: 1px solid var(--rule); border-radius: 3px; padding: 0 0.4rem; }
+  .state[data-state='In development'] { background: var(--amber); color: var(--amber-ink); border-color: transparent; }
+</style>

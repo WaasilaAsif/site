@@ -1,0 +1,21 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { getPosts } from '../../lib/posts';
+
+const technical = await getPosts('technical');
+const notes = await getPosts('notes');
+---
+<Base title="Writing" description="Technical posts and personal notes by Waasila Asif.">
+  <h1>Writing</h1>
+  <p class="muted measure">
+    Technical posts go deep on one mechanism. Notes are shorter and more personal.
+    Some posts live on Medium or dev.to; those link out.
+  </p>
+
+  <h2>Technical</h2>
+  <PostList posts={technical} showKind={false} />
+
+  <h2>Notes</h2>
+  <PostList posts={notes} showKind={false} />
+</Base>

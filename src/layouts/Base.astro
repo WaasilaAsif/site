@@ -1,0 +1,120 @@
+---
+import '../styles/global.css';
+import { SITE } from '../site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  article?: boolean;
+}
+const { title, description = SITE.description, canonical, article = false } = Astro.props;
+const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name}: ${SITE.tagline}`;
+const url = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
+const path = Astro.url.pathname;
+const nav = [
+  { href: '/writing/', label: 'writing' },
+  { href: '/projects/', label: 'projects' },
+  { href: '/bookmarks/', label: 'bookmarks' },
+  { href: '/about/', label: 'about' },
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={url} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
+    <meta property="og:title" content={title ?? SITE.name} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={article ? 'article' : 'website'} />
+    <meta property="og:url" content={url} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="theme-color" content="#eef1f3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121821" media="(prefers-color-scheme: dark)" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script is:inline>
+      try {
+        const t = localStorage.getItem('theme');
+        if (t) document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="wrap site-head">
+      <a class="home" href="/" aria-current={path === '/' ? 'page' : undefined}>waasila</a>
+      <nav aria-label="Main">
+        {nav.map((n) => (
+          <a href={n.href} aria-current={path.startsWith(n.href) ? 'page' : undefined}>{n.label}</a>
+        ))}
+        <a href="/rss.xml">rss</a>
+      </nav>
+    </header>
+
+    <main id="main" class="wrap">
+      <slot />
+    </main>
+
+    <footer class="wrap site-foot">
+      <p>
+        <a href={SITE.github}>github</a>
+        <a href={SITE.medium}>medium</a>
+        {SITE.linkedin && <a href={SITE.linkedin}>linkedin</a>}
+        {SITE.email && <a href={`mailto:${SITE.email}`}>email</a>}
+        <button type="button" class="theme" id="theme-toggle">toggle theme</button>
+      </p>
+      <p class="muted small">
+        Written by hand in Islamabad and Lahore. Static HTML, no trackers.
+      </p>
+    </footer>
+
+    <script is:inline>
+      document.getElementById('theme-toggle').addEventListener('click', () => {
+        const root = document.documentElement;
+        const dark = root.dataset.theme
+          ? root.dataset.theme === 'dark'
+          : matchMedia('(prefers-color-scheme: dark)').matches;
+        root.dataset.theme = dark ? 'light' : 'dark';
+        try { localStorage.setItem('theme', root.dataset.theme); } catch (e) {}
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  .site-head {
+    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+    gap: 0.5rem 1.5rem; padding-top: 2rem; padding-bottom: 3rem;
+  }
+  .home {
+    font-family: var(--mono); font-weight: 500; font-size: 1rem;
+    color: var(--ink); text-decoration: none;
+  }
+  .home::before { content: '$ '; color: var(--graphite); }
+  nav { display: flex; flex-wrap: wrap; gap: 0.25rem 1.1rem; }
+  nav a { color: var(--graphite); text-decoration: none; font-size: 0.97rem; }
+  nav a:hover, nav a[aria-current='page'] { color: var(--ink); text-decoration: underline; text-decoration-color: var(--amber); text-decoration-thickness: 3px; }
+
+  main { min-height: 60vh; }
+
+  .site-foot { margin-top: 6rem; padding-top: 1.25rem; padding-bottom: 3rem; border-top: 1px solid var(--rule); }
+  .site-foot p { margin: 0 0 0.4rem; display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; align-items: baseline; }
+  .site-foot a { color: var(--graphite); }
+  .site-foot a:hover { color: var(--ink); }
+  .small { font-size: 0.88rem; }
+  .theme {
+    font: inherit; color: var(--graphite); background: none; border: 0; padding: 0;
+    text-decoration: underline; text-underline-offset: 0.18em; cursor: pointer;
+  }
+  .theme:hover { color: var(--ink); }
+</style>
